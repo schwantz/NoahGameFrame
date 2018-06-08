@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class movie : MonoBehaviour {
+    Thread thread4, thread2, thread3;
 
     public class player
     {
@@ -38,6 +40,10 @@ public class movie : MonoBehaviour {
             wh = AndroidJNI.FromIntArray(intArray);
 
         Debug.LogFormat("============================= width : {0}, height : {0} =============================", wh[0], wh[1]);
+        //thread4 = new Thread(camMovie);
+        //thread4.IsBackground = true;
+        //thread4.Start();
+
     }
 
     // Update is called once per frame
@@ -47,7 +53,6 @@ public class movie : MonoBehaviour {
             return;
 
         Debug.Log("Update");
-
         try
         {
 
@@ -70,16 +75,11 @@ public class movie : MonoBehaviour {
             byte[] bytes = new byte[length * sizeof(int)];
             Buffer.BlockCopy(videoData, 0, bytes, 0, bytes.Length);
 
-            Texture2D bmp = new Texture2D(wh[0], wh[1], TextureFormat.ARGB32, false);
+            Texture2D bmp = new Texture2D(wh[0], wh[1], TextureFormat.BGRA32, false);
 
             bmp.LoadRawTextureData(bytes);
             bmp.Apply();
 
-            //			Sprite sprite = Sprite.Create(bmp, new Rect(0, 0, bmp.width, bmp.height), new Vector2 (0.5f, 0.5f), 100F, 0, SpriteMeshType.FullRect);
-
-            //			Texture2D nativeTexture = Texture2D.CreateExternalTexture(wh[0], wh[1], TextureFormat.ARGB32, false, false, (IntPtr)intArray2);
-            //			bmp.UpdateExternalTexture(nativeTexture.GetNativeTexturePtr());
-            //			bmp.Apply();
 
             liveRawImage.texture = bmp;
 
@@ -93,7 +93,56 @@ public class movie : MonoBehaviour {
         }
 
     }
+    void camMovie()
+    {
+        while (true)
+        {
+            try
+            {
 
+                IntPtr methodID2 = AndroidJNI.GetMethodID(videoPlaying.GetRawClass(), "getVideoImage", "()[I");
+                AndroidJavaObject nullObject2 = null;
+
+
+                UnityEngine.jvalue[] args2 = AndroidJNIHelper.CreateJNIArgArray(new[] { nullObject2 });
+                IntPtr intArray2 = AndroidJNI.CallObjectMethod(videoPlaying.GetRawObject(), methodID2, args2);
+
+                if (intArray2 == IntPtr.Zero)
+                    return;
+
+                int[] videoData = AndroidJNI.FromIntArray(intArray2);
+
+                int length = videoData.Length;
+                if (length <= 0 || wh == null || wh[0] <= 0 || wh[1] <= 0)
+                    return;
+
+                byte[] bytes = new byte[length * sizeof(int)];
+                Buffer.BlockCopy(videoData, 0, bytes, 0, bytes.Length);
+
+                Texture2D bmp = new Texture2D(wh[0], wh[1], TextureFormat.BGRA32, false);
+
+                bmp.LoadRawTextureData(bytes);
+                bmp.Apply();
+
+                //			Sprite sprite = Sprite.Create(bmp, new Rect(0, 0, bmp.width, bmp.height), new Vector2 (0.5f, 0.5f), 100F, 0, SpriteMeshType.FullRect);
+
+                //			Texture2D nativeTexture = Texture2D.CreateExternalTexture(wh[0], wh[1], TextureFormat.ARGB32, false, false, (IntPtr)intArray2);
+                //			bmp.UpdateExternalTexture(nativeTexture.GetNativeTexturePtr());
+                //			bmp.Apply();
+
+                liveRawImage.texture = bmp;
+
+                Resources.UnloadUnusedAssets();
+
+                Debug.LogFormat("============================= Update : videoData int len : {0} =============================", length);
+            }
+            catch (Exception e)
+            {
+                Debug.LogFormat("============================= Update : Exception {0} ====================================", e.Message);
+            }
+
+        }
+    }
     void OnGUI()
     {
         if (Application.platform != RuntimePlatform.Android)

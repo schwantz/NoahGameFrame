@@ -22,6 +22,7 @@ namespace NFTCPClient
         public ArrayList aCharList = new ArrayList();
 
         public ArrayList aChatMsgList = new ArrayList();
+        public ArrayList aChatMsgList2 = new ArrayList();
         public ArrayList aMsgList = new ArrayList();
 
 
@@ -830,6 +831,7 @@ namespace NFTCPClient
             xReqAckChat = Serializer.Deserialize<NFMsg.ReqAckPlayerChat>(new MemoryStream(xMsg.msg_data));
 
             aChatMsgList.Add(PBToNF(xReqAckChat.chat_id).ToString() + ":" + System.Text.Encoding.Default.GetString(xReqAckChat.chat_info));
+            aChatMsgList2.Add(System.Text.Encoding.Default.GetString(xReqAckChat.chat_info));
         }
     }
 

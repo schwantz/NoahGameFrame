@@ -19,6 +19,7 @@ using NFrame;
 using NFMsg;
 using ProtoBuf;
 
+
 public class NFStart : MonoBehaviour
 {
     //看开启多人模式还是单人模式
@@ -28,6 +29,9 @@ public class NFStart : MonoBehaviour
     int nPort = 0;
     public bool bCommand = false;
     public bool bDebugMode = false;
+#if UNITY_ANDROID_KEY
+    private IO rs232;
+#endif
 
     public Transform[] mTrans;
 
@@ -61,7 +65,7 @@ public class NFStart : MonoBehaviour
         return null;
     }
 
-    #region Instance
+#region Instance
     private static NFStart _Instance = null;
     public static NFStart Instance
     {
@@ -71,14 +75,14 @@ public class NFStart : MonoBehaviour
         }
 
     }
-    #endregion
+#endregion
 
 
 
     void Awake()
     {
         _Instance = this;
-
+        
         foreach (Transform trans in mTrans)
         {
             if (null != trans)
@@ -100,7 +104,11 @@ public class NFStart : MonoBehaviour
     void Start()
     {
 
-
+#if UNITY_ANDROID_KEY
+        GameObject go = GameObject.Find("RawImage");
+        rs232 = (IO)go.GetComponent(typeof(IO));
+#endif
+        
         NFCKernelModule.Instance.AfterInit();
         NFCRenderInterface.Instance.Init();
     }
@@ -113,6 +121,7 @@ public class NFStart : MonoBehaviour
             mxNetFocus.Destroy();
         }
     }
+    string teststr = "";
 
     void OnGUI()
     {
@@ -120,7 +129,72 @@ public class NFStart : MonoBehaviour
         if (null != mxNetFocus)
         {
             mxNetFocus.Update();
-            mxNetFocus.OnGUI(1024, 768);
+            //mxNetFocus.OnGUI(1024, 768);
+            string strData = "";
+            if (mxNetFocus.mxListener != null && mxNetFocus.mxListener.aChatMsgList2.Count > 0)
+            {
+                strData = (string)mxNetFocus.mxListener.aChatMsgList2[0];
+                    mxNetFocus.mxListener.aChatMsgList2.RemoveAt(0);
+            }
+#if UNITY_ANDROID_KEY
+            //string ss = rs232.count1.ToString();
+            //if (GUI.Button(new Rect(200, 200, 150, 50), ss))
+            //{
+            //    rs232.grab();
+
+            //}
+            if (GUI.Button(new Rect(350, 200, 150, 50), teststr))
+            {
+                //teststr=rs232.GettestValue();
+
+            }
+            if (strData.Equals("RS232:UPdown"))
+            {
+                rs232.fd();
+            }
+            else if (strData.Equals("RS232:UPup"))
+            {
+                rs232.fp();
+
+            }
+            else if (strData.Equals("RS232:DOWNdown"))
+            {
+                rs232.bd();
+
+            }
+            else if (strData.Equals("RS232:DOWNup"))
+            {
+                rs232.bp();
+
+            }
+            else if (strData.Equals("RS232:LEFTdown"))
+            {
+                rs232.ld();
+
+            }
+            else if (strData.Equals("RS232:LEFTup"))
+            {
+                rs232.lp();
+
+            }
+            else if (strData.Equals("RS232:RIGHTdown"))
+            {
+                rs232.rd();
+
+            }
+            else if (strData.Equals("RS232:RIGHTup"))
+            {
+                rs232.rp();
+
+            }
+            else if (strData.Equals("RS232:CATCH"))
+            {
+                rs232.grab();
+
+
+            }
+#endif
+
         }
 
         if (null != mxNetFocus)
@@ -268,4 +342,42 @@ public class NFStart : MonoBehaviour
             mxNetFocus = new NFNet();
         }
     }
+#if !UNITY_ANDROID_KEY
+    public void sendrs232_CATCH()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:CATCH");
+    }
+    public void sendrs232_UPdown()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:UPdown");
+    }
+    public void sendrs232_UPup()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:UPup");
+    }
+    public void sendrs232_DOWNdown()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:DOWNdown");
+    }
+    public void sendrs232_DOWNup()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:DOWNup");
+    }
+    public void sendrs232_LEFTdown()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:LEFTdown");
+    }
+    public void sendrs232_LEFTup()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:LEFTup");
+    }
+    public void sendrs232_RIGHTdown()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:RIGHTdown");
+    }
+    public void sendrs232_RIGHTup()
+    {
+        mxNetFocus.mxSendLogic.RequireChat(new NFrame.NFGUID(), new NFrame.NFGUID(), 3, "RS232:RIGHTup");
+    }
+#endif
 }
