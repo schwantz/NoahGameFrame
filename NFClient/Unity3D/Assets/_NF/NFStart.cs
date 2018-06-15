@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 using NFrame;
 using NFMsg;
 using ProtoBuf;
-
+using UnityEngine.UI;
 
 public class NFStart : MonoBehaviour
 {
@@ -32,6 +32,7 @@ public class NFStart : MonoBehaviour
 #if UNITY_ANDROID_KEY
     private IO rs232;
 #endif
+    GameObject  button1;
 
     public Transform[] mTrans;
 
@@ -90,10 +91,15 @@ public class NFStart : MonoBehaviour
                 trans.gameObject.SetActive(true);
             }
         }
+        button1 = GameObject.Find("BButton1");
+        button1.GetComponentInChildren<Text>().text = "BButton1";
 
+        enabled = true;
         mConfig = new NFConfig();
         mConfig.Load();
         mConfig.GetSelectServer(ref strTargetIP, ref nPort);
+        Debug.Log("Awake()--------------------------------------------");
+        button1.GetComponentInChildren<Text>().text = strTargetIP;
 
         NFCKernelModule.Instance.GetLogicClassModule().SetDataPath(mConfig.GetDataPath());
 
@@ -223,7 +229,7 @@ public class NFStart : MonoBehaviour
                             //GUI.Button(new Rect(200, 200, 350, 50), "2Loginss");
                             mxNetFocus.strAccount = GUI.TextField(new Rect(10, 10, 150, 50), mxNetFocus.strAccount);
                             mxNetFocus.strPassword = GUI.TextField(new Rect(10, 100, 150, 50), mxNetFocus.strPassword);
-                            if (GUI.Button (new Rect (10, 200, 150, 50), "Loginss"))
+                            if (GUI.Button (new Rect (10, 600, 250, 150), "Loginss"))
                             {
                                 Debug.Log("Login  Name: " + mxNetFocus.strAccount + "  Pass: " + mxNetFocus.strPassword);
                                 mxNetFocus.mxSendLogic.LoginPB(mxNetFocus.strAccount, mxNetFocus.strPassword, "");
@@ -238,7 +244,7 @@ public class NFStart : MonoBehaviour
                         for (int i = 0; i < mxNetFocus.mxListener.aWorldList.Count; ++i )
                         {
                             ServerInfo xInfo = (ServerInfo)mxNetFocus.mxListener.aWorldList[i];
-                            if (GUI.Button(new Rect(10, i * nHeight, 150, nHeight), System.Text.Encoding.Default.GetString(xInfo.name)))
+                            if (GUI.Button(new Rect(10, i * nHeight+600, 150, nHeight+100), System.Text.Encoding.Default.GetString(xInfo.name)))
                             {
                                 NFStart.Instance.GetFocusNet().nServerID = xInfo.server_id;
                                 mxNetFocus.mxSendLogic.RequireConnectWorld(xInfo.server_id);
@@ -287,7 +293,7 @@ public class NFStart : MonoBehaviour
                         for (int i = 0; i < mxNetFocus.mxListener.aServerList.Count; ++i)
                         {
                             ServerInfo xInfo = (ServerInfo)mxNetFocus.mxListener.aServerList[i];
-                            if (GUI.Button(new Rect(nWidth, i * 50, 150, 50), System.Text.Encoding.Default.GetString(xInfo.name)))
+                            if (GUI.Button(new Rect(nWidth, i * 50+600, 150, 50+100), System.Text.Encoding.Default.GetString(xInfo.name)))
                             {
                                 NFStart.Instance.GetFocusNet().nServerID = xInfo.server_id;
                                 NFStart.Instance.GetFocusSender().RequireSelectServer(xInfo.server_id);
@@ -304,7 +310,7 @@ public class NFStart : MonoBehaviour
                             for (int i = 0; i < mxNetFocus.mxListener.aCharList.Count; ++i)
                             {
                                 NFMsg.RoleLiteInfo xLiteInfo = (NFMsg.RoleLiteInfo)mxNetFocus.mxListener.aCharList[i];
-                                if (GUI.Button(new Rect(200, i * 50, 150, 50), System.Text.Encoding.Default.GetString(xLiteInfo.noob_name)))
+                                if (GUI.Button(new Rect(200, i * 50+600, 150, 50+100), System.Text.Encoding.Default.GetString(xLiteInfo.noob_name)))
                                 {
                                     mxNetFocus.strRoleName = System.Text.Encoding.Default.GetString(xLiteInfo.noob_name);
                                     NFStart.Instance.GetFocusNet().nMainRoleID = NFTCPClient.NFCoreExListener.PBToNF(xLiteInfo.id);

@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class movie : MonoBehaviour {
+    [DllImport("__Internal")]
+    private static extern void ActivateVideoView();
+
     Thread thread4, thread2, thread3;
 
     public class player
@@ -20,6 +24,10 @@ public class movie : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            ActivateVideoView();
+        }
         if (Application.platform != RuntimePlatform.Android)
             return;
             //    player1 = new player;
