@@ -49,6 +49,7 @@ public class NFConfig
         xmldoc = new XmlDocument();
 
         xmldoc.LoadXml(textAsset);
+
         root = xmldoc.SelectSingleNode("XML");
 
 

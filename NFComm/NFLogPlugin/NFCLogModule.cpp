@@ -77,8 +77,6 @@ void NFCLogModule::copyConfFile(const char *filename)
 
 }
 
-NFCLogModule::NFCLogModule(NFIPluginManager* p)
-{
     pPluginManager = p;
 }
 string NFCLogModule::getLogConfigFileName(std::string aName)
